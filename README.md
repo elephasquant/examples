@@ -23,7 +23,7 @@ example01
 
 2. Create some python files (`main1.py, main2.py`) to run your codes. These files are execuators of your codes and can be read by others.
 
-3. Create the `setup.py` file and run `python setup.py bdist_wheel --exclude-source-files`. It will create the binary package and exclude the source files.
+3. Create the `setup.py` file and run `python setup.py bdist_wheel --exclude-source-files`. It will create the binary package (`pyd`) and exclude the source files. The `pyd` files are [hard to reverse engineer](https://stackoverflow.com/questions/12075042/how-hard-to-reverse-engineer-pyd-files), so it can protect your source code.
 
 ```powershell
 example01\dist
