@@ -3,6 +3,7 @@ import sys
 from setuptools import setup
 from setuptools.extension import Extension
 from Cython.Distutils import build_ext
+from elephas_wheel import bdist_wheel
 
 
 def list_files(root: str, src: str) -> list:
@@ -13,7 +14,7 @@ def list_files(root: str, src: str) -> list:
         root = ""
     if src == '.':
         src = ""
-        
+
     res, pys = [], []
     for f in fs:
         path_src = os.path.join(src, f)
@@ -27,11 +28,12 @@ def list_files(root: str, src: str) -> list:
     return res
 
 
-if __name__ == '__main__':
-    files = list_files("./", "./")
-    exts = list(map(lambda x: Extension(x[0], sources=[x[1]]), files))
-    print(files)
-    setup(
-        cmdclass={'build_ext': build_ext},
-        ext_modules=exts
-    )
+setup(
+    name='pkga',
+    version='0.0.1',
+    author='xitongsys',
+    author_email='xitongsys@gmail.com',
+    packages=['pkga'],
+    cmdclass={'build_ext': build_ext, 'bdist_wheel': bdist_wheel.bdist_wheel},
+    ext_modules=list(map(lambda x: Extension(x[0], sources=[x[1]]), list_files("./", "./")))
+)

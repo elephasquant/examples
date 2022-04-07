@@ -1,4 +1,4 @@
-from pkga import A as aA
+from . import A as aA
 from pkga.pkgb import A as bA
 
 def funcb():
