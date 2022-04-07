@@ -2,10 +2,9 @@
 
 ## Package directory structure
 
-directory struct of the example01
+directory struct of the example
 
 ```powershell
-example01
 |
 │  main1.py
 |  main2.py
@@ -26,7 +25,7 @@ example01
 3. Create the `setup.py` file and run `python setup.py bdist_wheel --exclude-source-files`. It will create the binary package (`pyd`) and exclude the source files. The `pyd` files are [hard to reverse engineer](https://stackoverflow.com/questions/12075042/how-hard-to-reverse-engineer-pyd-files), so it can protect your source code.
 
 ```powershell
-example01\dist
+dist
 |
 │  pkga-0.0.1-cp310-cp310-win_amd64.whl
 │
