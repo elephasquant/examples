@@ -27,6 +27,9 @@ def list_files(root: str, src: str) -> list:
     res += pys
     return res
 
+ext_modules = list(map(lambda x: Extension(x[0], sources=[x[1]]), list_files("./", "./")))
+for e in ext_modules:
+    e.cython_directives = {'language_level': "3"} #all are Python-3
 
 setup(
     name='pkga',
@@ -35,5 +38,5 @@ setup(
     author_email='xitongsys@gmail.com',
     packages=['pkga'],
     cmdclass={'build_ext': build_ext, 'bdist_wheel': bdist_wheel.bdist_wheel},
-    ext_modules=list(map(lambda x: Extension(x[0], sources=[x[1]]), list_files("./", "./")))
+    ext_modules=ext_modules,
 )
