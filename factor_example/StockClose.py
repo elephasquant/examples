@@ -10,6 +10,12 @@ from factorbase.factor import Factor, SecurityType, Frequency
 class StockClose(Factor):
     def __init__(self):
         rq.init()
+    
+    def factor_name(self) -> str:
+        return "StockClose"
+    
+    def author(self) -> str:
+        return "xitong"
 
     @Factor.checker
     def frequency(self) -> Frequency:
@@ -32,16 +38,21 @@ class StockClose(Factor):
             dt += timedelta(days=1)
         codes = sorted(list(codes))
         
-        df = rq.get_price(codes,
+        df_px = rq.get_price(codes,
                           start_date=start_time.strftime('%Y-%m-%d'),
                           end_date=end_time.strftime('%Y-%m-%d'),
                           frequency='1d')
-
-        df.index.rename(['code', 'datetime'], inplace=True)
-        df = df[['close']]
-        df['gen_time'] = df.index.get_level_values(1) + timedelta(hours=15)
-        df.rename(columns={'close':'StockClose'}, inplace=True)
+               
+        df = pd.DataFrame(index=df_px.index.levels[1].rename('datetime'), columns=['gen_time'] + codes)
+        for idx in df_px.index:
+            sym, day = idx
+            close_px = df_px.loc[idx, 'close']
+            
+            df.loc[day, sym] = close_px
+            df.loc[day, 'gen_time'] = day + timedelta(hours=15)
+            
         return df, None
+
 
 
 if __name__ == '__main__':
@@ -50,8 +61,9 @@ if __name__ == '__main__':
     try:
         df, err = close.run(now - timedelta(days=10), now)
     except Exception as e:
-        print(e)
+        print("error: ", e)
         exit(-1)
     
     print(df, err)
+    df.to_pickle("StockClose.pkl")
     

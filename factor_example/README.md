@@ -1,4 +1,4 @@
-# Factor code example
+# Factor 基类
 
 `Factor` 是实现factor的基类。所有要加入因子库的factor都要继承这个类，并实现其中的几个抽象方法。安装请运行下面程序
 
@@ -9,7 +9,37 @@ python -m pip install --index-url http://192.168.0.157:8081/simple/ factorbase -
 ### 代码
 
 ```python
+class SecurityType(Enum):
+    DEFAULT = "default"
+    FUTURE = "future"
+    FUTURE_COMMODITY = "future_commodity"
+    FUTURE_INDEX = "future_index"
+    STOCK = "stock"
+
+
+class Frequency(Enum):
+    MONTHLY = 'monthly'
+    DAILY = 'daily'
+    HOURLY = 'hourly'
+    MINUTE = 'minute'
+    SECOND = 'second'
+
+
 class Factor(ABC):
+    @abstractmethod
+    def factor_name(self) -> str:
+        """
+        return: 因子名称
+        """
+        pass
+
+    @abstractmethod
+    def author(self) -> str:
+        """
+        return: 作者
+        """
+        pass
+
     @abstractmethod
     def security_type(self) -> SecurityType:
         """
@@ -46,21 +76,22 @@ class Factor(ABC):
         这是一个daily的因子，因此需要返回所有在[start_time, end_time]之间的每个票在每个交易日的close
         DataFrame的格式为
 
-        index为 [code, datetime]
-        columns为 ['Close', 'gen_time']
+        index为 [datetime]
+        columns为 ['gen_time', 'A2201', 'A2205', ...]
 
-                          Close gen_time
-        code datetime              
-        A2205 2022-01-04  5877.0 2022-01-04 15:00:00
-              2022-01-05  5912.0 2022-01-04 15:00:00
-              2022-01-06  5877.0 2022-01-04 15:00:00
-              2022-01-07  5894.0 2022-01-04 15:00:00
+                    gen_time            A2201  A2205  ....
+        datetime              
+        2022-01-04  2022-01-04 15:00:00 5877.0 5876.0   
+        2022-01-05  2022-01-04 15:00:00 5912.0 5917.0
+        2022-01-06  2022-01-04 15:00:00 5877.0 5879.0 
+        2022-01-07  2022-01-04 15:00:00 5894.0 5895.0
 
         其中 'gen_time' 为这个因子理论上最早能算出来的时间。对于close而言，收盘后才能拿到，那么就是15：00
 
         如果在计算过程中有异常或者计算的不全，需要返回一个异常（如果有严重错误，可以直接抛出一个异常）
         """
         pass
+
 ```
 
 ## 说明
@@ -69,12 +100,12 @@ class Factor(ABC):
 
 * 各个标的的 `code` 以米筐的 `order_book_id` 为统一标准
 
-* 返回的因子数据是一个DataFrame，`index` 是二级索引为`['code', 'datetime']`，数据为两列`[FactorName, 'gen_time']`
+* 返回的因子数据是一个DataFrame，`index` 为因子时间`'datetime'`，数据为各个票的因子值，其中第一列为`gen_time`
 
 * `index` 中的 `datetime` 和数据列中的 `gen_time` 格式都为 `np.datetime`。具体含义可以参考下面代码中的注释
 
 * 在实现各个函数的时候，请加上 `@Factor.checker` 修饰，这个可以帮助检查返回的结果格式是否正确
 
-* 每天股票收盘价作为一个因子，这里有个[例子](https://github.com/elephasquant/examples/tree/main/factor_example/StockClose.py)
+* 每天收盘价作为一个因子，这里有个[例子](https://github.com/elephasquant/examples/tree/main/factor_example/StockClose.py)
 
 
